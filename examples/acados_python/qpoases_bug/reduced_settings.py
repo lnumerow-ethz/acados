@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-def reduced_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING_HPIPM", print_level=0):
+def reduced_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING_HPIPM", soft_constr=False, print_level=0):
     # create render arguments
     ocp = AcadosOcp()
 
@@ -35,9 +35,6 @@ def reduced_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING
     ocp.dims.nh = 0
     ocp.dims.nsh = 0
     ocp.dims.ns = nx + nu
-
-    ocp.dims.nsbx = nx
-    ocp.dims.nsbu = nu
 
     if False:
         ny = 0
@@ -73,18 +70,25 @@ def reduced_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING
         ocp.cost.yref_e = Y
     ####
 
-    ocp.constraints.lsbx = np.zeros(ocp.dims.nsbx)
-    ocp.constraints.usbx = np.zeros(ocp.dims.nsbx)
-    ocp.constraints.idxsbx = np.array([0])
+    if soft_constr:
+        ocp.dims.nsbx = nx
+        ocp.dims.nsbu = nu
 
-    ocp.constraints.lsbu = np.zeros(ocp.dims.nsbu)
-    ocp.constraints.usbu = np.zeros(ocp.dims.nsbu)
-    ocp.constraints.idxsbu = np.array([0])
+        ocp.constraints.lsbx = np.zeros(ocp.dims.nsbx)
+        ocp.constraints.usbx = np.zeros(ocp.dims.nsbx)
+        ocp.constraints.idxsbx = np.array([0])
 
-    ocp.cost.zl = 100*np.ones(2)
-    ocp.cost.zu = 100*np.ones(2)
-    ocp.cost.Zl = np.zeros(2)
-    ocp.cost.Zu = np.zeros(2)
+        ocp.constraints.lsbu = np.zeros(ocp.dims.nsbu)
+        ocp.constraints.usbu = np.zeros(ocp.dims.nsbu)
+        ocp.constraints.idxsbu = np.array([0])
+
+        ocp.cost.zl = 100*np.ones(2)
+        ocp.cost.zu = 100*np.ones(2)
+        ocp.cost.Zl = np.zeros(2)
+        ocp.cost.Zu = np.zeros(2)
+    else:
+        ocp.dims.nsbx = nx
+        ocp.dims.nsbu = nu
 
     # setting constraints
 

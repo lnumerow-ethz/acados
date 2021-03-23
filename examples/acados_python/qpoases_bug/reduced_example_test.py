@@ -43,18 +43,16 @@ from time import perf_counter as clock
 
 
 # Important options
-load_previous_trajectory = False
-track_name = "straight"  # "arc", "straight"
+soft_constraints = True
+N = 12  # NOTE: N=12 breaks QPOASES with soft constraints, N=11 works
 qp_solver = "FULL_CONDENSING_QPOASES"  # "PARTIAL_CONDENSING_HPIPM", "FULL_CONDENSING_QPOASES"
 solver_type = "SQP_RTI"  # "SQP_RTI", "SQP", "ZO_SQP"
 print_level = 0
 plot_update_time = 0.5
 niter = 50
-N = 12  # NOTE: N=12 breaks QPOASES, N=11 works
-if not load_previous_trajectory:
-    initial_guess_type = "straight_line"
-    initial_velocity = 1.0
 
+load_previous_trajectory = False
+initial_velocity = 1.0
 
 track_dt = 0.01
 track_N = 157
@@ -69,12 +67,12 @@ plt.ion()
 plt.show()
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.plot(xtrack, 0.3 * np.ones(np.size(xtrack)), 'k')
-ax.plot(xtrack, - 0.3 * np.ones(np.size(xtrack)), 'k')
+ax.plot(0.0 * np.ones(N), '--k')
+ax.plot(1.0 * np.ones(N), '--k')
 
 # optimization problem starts here...
 Ts = 1.0/(N-1)
-model, acados_solver, acados_integrator, nx, nu, npar = reduced_settings(N, Ts, solver_type, qp_solver, print_level)
+model, acados_solver, acados_integrator, nx, nu, npar = reduced_settings(N, Ts, solver_type, qp_solver, soft_constraints, print_level)
 
 # initialize trajectory
 if load_previous_trajectory:
@@ -94,14 +92,13 @@ else:
     acados_solver.set(0, "ubx", x0)
     for i in range(N):
         t = i * Ts
-        if initial_guess_type == "straight_line":
-            xt = np.array([t * initial_velocity])
+        xt = np.array([t * initial_velocity])
         acados_solver.set(i, "x", xt)
         acados_solver.set(i, "u", u0)
 
 
 # find initial set of linearization points
-plotx0, = ax.plot([], [], '-bo')
+plotx0, = ax.plot([ii for ii in range(N)], np.zeros(N), '-bo')
 finalX = np.zeros((N, nx))
 finalU = np.zeros((N, nu))
 for i in range(niter+1):
@@ -124,12 +121,12 @@ for i in range(niter+1):
 
         x_horizon.append(x[0])
 
-        plotx0.set_xdata(x_horizon)
-        plotx0.set_ydata(0 * np.ones(np.size(x_horizon)))
-
         if i == niter:
             finalX[j, :] = x
             finalU[j, :] = u
+
+        if j == N-1:
+            plotx0.set_ydata(x_horizon)
 
     plt.draw()
     plt.pause(plot_update_time)
