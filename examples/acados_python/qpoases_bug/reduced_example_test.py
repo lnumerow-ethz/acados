@@ -109,9 +109,10 @@ for i in range(niter+1):
         t_run = clock() - t_before
         print('solve time,', t_run)
         if status != 0:
-            print("Failed on: ", i)
-            #raise RuntimeError(
-            #    "acados returned status {0} in closed loop iteration {1}. Exiting.".format(status, i))
+            print("Failed on instance ", i, " with status ", status)
+            import pdb; pdb.set_trace()
+
+    acados_solver.print_statistics()
 
     x_horizon = []
     for j in range(N):
