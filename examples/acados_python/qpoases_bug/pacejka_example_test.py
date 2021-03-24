@@ -44,12 +44,12 @@ from time import perf_counter as clock
 
 # Important options
 load_previous_trajectory = True
-track_name = "straight"  # "arc", "straight"
-qp_solver = "FULL_CONDENSING_QPOASES"  # "PARTIAL_CONDENSING_HPIPM", "FULL_CONDENSING_QPOASES"
-solver_type = "SQP_RTI"  # "SQP_RTI", "SQP", "ZO_SQP"
-print_level = 0
-plot_update_time = 0.01
-niter = 500
+track_name = "arc"  # "arc", "straight"
+qp_solver = "PARTIAL_CONDENSING_HPIPM"  # "PARTIAL_CONDENSING_HPIPM", "FULL_CONDENSING_QPOASES"
+solver_type = "ZO_SQP"  # "SQP_RTI", "SQP", "ZO_SQP"
+print_level = 1
+plot_update_time = 0.2
+niter = 50
 if not load_previous_trajectory:
     initial_guess_type = "straight_line"  # "stationary", "follow_track", "straight_line"
     initial_velocity = [1.0, 0.0]
@@ -96,7 +96,7 @@ ax.plot(xtrack - half_track_width * yrate, ytrack + half_track_width * xrate, 'k
 
 # optimization problem starts here...
 N = 10
-Ts = 1.0/10.0
+Ts = 1.0/N
 model, acados_solver, acados_integrator, nx, nu, npar = pacejka_settings(N, Ts, solver_type, qp_solver, print_level)
 
 # cost params
@@ -168,7 +168,7 @@ plot, = ax.plot([], [], 'r')
 finalX = np.zeros((N, nx))
 finalU = np.zeros((N, nu))
 for i in range(niter+1):
-    print(i)
+    print("iteration", i)
     if i > 0:
         t_before = clock()
         status = acados_solver.solve()

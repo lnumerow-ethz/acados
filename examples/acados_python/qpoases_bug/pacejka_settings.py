@@ -132,6 +132,7 @@ def pacejka_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING
     ocp.solver_options.hessian_approx = "GAUSS_NEWTON"
     ocp.solver_options.integrator_type = "ERK"
     ocp.solver_options.nlp_solver_step_length = 1.0
+    ocp.solver_options.qp_solver_iter_max = 50
     ocp.solver_options.sim_method_num_stages = 4
     ocp.solver_options.sim_method_num_steps = 3
     ocp.solver_options.print_level = print_level
