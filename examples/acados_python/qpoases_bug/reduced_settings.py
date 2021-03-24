@@ -133,6 +133,7 @@ def reduced_settings(N, Ts, solver_type="SQP_RTI", qp_solver="PARTIAL_CONDENSING
     ocp.solver_options.sim_method_num_stages = 4
     ocp.solver_options.sim_method_num_steps = 3
     ocp.solver_options.print_level = print_level
+    # ocp.solver_options.qp_solver_iter_max = 100
 
     ocp.solver_options.tol = 1e-4
 
